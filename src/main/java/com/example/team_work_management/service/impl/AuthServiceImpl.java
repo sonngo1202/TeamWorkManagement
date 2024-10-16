@@ -5,11 +5,17 @@ import com.example.team_work_management.exception.error.EmailAlreadyExistsExcept
 import com.example.team_work_management.exception.error.EmailNotFoundException;
 import com.example.team_work_management.exception.error.InvalidVerificationCodeException;
 import com.example.team_work_management.exception.error.VerificationCodeExpiredException;
-import com.example.team_work_management.repository.UserRepository;
+import com.example.team_work_management.repository.IUserRepository;
+import com.example.team_work_management.security.CustomUserDetailService;
+import com.example.team_work_management.security.JwtUtil;
 import com.example.team_work_management.service.AuthService;
 import com.example.team_work_management.service.EmailService;
 import com.example.team_work_management.service.ImageService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -23,10 +29,19 @@ import java.util.Random;
 public class AuthServiceImpl implements AuthService {
 
     @Autowired
-    private UserRepository userRepository;
+    private IUserRepository userRepository;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private JwtUtil jwtUtil;
+
+    @Autowired
+    private CustomUserDetailService customUserDetailService;
+
+    @Autowired
+    private AuthenticationManager authenticationManager;
 
     @Autowired
     private EmailService emailService;
@@ -81,12 +96,29 @@ public class AuthServiceImpl implements AuthService {
             throw new InvalidVerificationCodeException("Invalid verification code");
         }
 
-        BufferedImage image = imageService.createImage(userPre.getFullName());
+        BufferedImage image = imageService.createImageUser(userPre.getFullName());
         String urlImage = imageService.uploadToFirebase(image);
 
         userPre.setPicture(urlImage);
         userPre.setActive(true);
         userRepository.save(userPre);
+
+        return true;
+    }
+
+    @Override
+    public boolean login(User user) {
+        authenticate(user);
+
+        final UserDetails userDetails = customUserDetailService.loadUserByUsername(user.getEmail());
+        final User info = userRepository.findByEmailAndIsActiveTrue(user.getEmail()).get();
+
+        user.setPicture(info.getPicture());
+        user.setFullName(info.getFullName());
+        user.setJob(info.getJob());
+        user.setLocation(info.getLocation());
+        user.setAccessToken(jwtUtil.generateToken(userDetails));
+        user.setRefreshToken(jwtUtil.generateRefreshToken(userDetails));
 
         return true;
     }
@@ -100,7 +132,7 @@ public class AuthServiceImpl implements AuthService {
         emailService.sendSimpleMessage(user.getEmail(), "Verify Code", "Your verification code is: " + user.getCode());
     }
 
-    public String generateVerifyCode(){
+    private String generateVerifyCode(){
         Random random = new Random();
         StringBuilder sb = new StringBuilder();
 
@@ -110,4 +142,15 @@ public class AuthServiceImpl implements AuthService {
 
         return sb.toString();
     }
+
+    private void authenticate(User user){
+        try{
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(user.getEmail(), user.getPassword())
+            );
+        }catch (BadCredentialsException e){
+            throw new BadCredentialsException("Incorrect email or password");
+        }
+    }
+
 }

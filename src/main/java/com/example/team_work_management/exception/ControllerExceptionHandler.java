@@ -1,9 +1,6 @@
 package com.example.team_work_management.exception;
 
-import com.example.team_work_management.exception.error.EmailAlreadyExistsException;
-import com.example.team_work_management.exception.error.EmailNotFoundException;
-import com.example.team_work_management.exception.error.InvalidVerificationCodeException;
-import com.example.team_work_management.exception.error.VerificationCodeExpiredException;
+import com.example.team_work_management.exception.error.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -64,6 +61,17 @@ public class ControllerExceptionHandler {
     public ErrorMessage handleVerificationCodeExpiredException(VerificationCodeExpiredException ex, WebRequest request){
         ErrorMessage message = new ErrorMessage(
                 HttpStatus.GONE.value(),
+                new Date(),
+                ex.getMessage(),
+                request.getDescription(false));
+        return message;
+    }
+
+    @ExceptionHandler(InvalidJwtTokenException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public ErrorMessage handleInvalidRefreshTokenException(InvalidJwtTokenException ex, WebRequest request){
+        ErrorMessage message = new ErrorMessage(
+                HttpStatus.UNAUTHORIZED.value(),
                 new Date(),
                 ex.getMessage(),
                 request.getDescription(false));

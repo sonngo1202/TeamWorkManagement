@@ -1,10 +1,7 @@
 package com.example.team_work_management.service.impl;
 
 import com.example.team_work_management.service.ImageService;
-import com.google.auth.oauth2.GoogleCredentials;
-import com.google.cloud.storage.Blob;
 import com.google.cloud.storage.BlobInfo;
-import com.google.cloud.storage.StorageOptions;
 import com.google.firebase.cloud.StorageClient;
 import org.springframework.stereotype.Service;
 
@@ -21,7 +18,7 @@ import java.util.UUID;
 @Service
 public class ImageServiceImpl implements ImageService {
     @Override
-    public BufferedImage createImage(String fullName) {
+    public BufferedImage createImageUser(String fullName) {
         String initials = getInitials(fullName);
 
         //Size image
@@ -68,9 +65,9 @@ public class ImageServiceImpl implements ImageService {
         BlobInfo blobInfo = BlobInfo.newBuilder(StorageClient.getInstance().bucket().getName(), fileName)
                 .setContentType("image/png")
                 .build();
-        Blob blob = StorageClient.getInstance().bucket().create(fileName, is, blobInfo.getContentType());
+        StorageClient.getInstance().bucket().create(fileName, is, blobInfo.getContentType());
 
-        return blob.getMediaLink();
+        return fileName;
     }
 
     private String getInitials(String fullName){

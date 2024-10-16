@@ -33,4 +33,10 @@ public class AuthController {
         authService.isVerificationCodeValid(user);
         return ResponseEntity.ok("Verify code successful");
     }
+
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody User user){
+        authService.login(user);
+        return ResponseEntity.ok(user);
+    }
 }

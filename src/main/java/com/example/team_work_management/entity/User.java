@@ -28,7 +28,7 @@ public class User implements Serializable {
     @Column(name = "email", nullable = false)
     private String email;
 
-    @JsonProperty("password")
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @Column(name = "password", nullable = false)
     private String password;
 
@@ -45,11 +45,17 @@ public class User implements Serializable {
     @Column(name = "is_active", nullable = false)
     private boolean isActive = false;
 
-    @JsonProperty("code")
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @Column(name = "code")
     private String code;
 
     @JsonIgnore
     @Column(name = "expires_at")
     private LocalDateTime expiresAt;
+
+    @Transient
+    private String accessToken;
+
+    @Transient
+    private String refreshToken;
 }

@@ -8,4 +8,5 @@ public interface AuthService {
     boolean register(User user);
     boolean retrieveCode(User user);
     boolean isVerificationCodeValid(User user) throws IOException;
+    boolean login(User user);
 }

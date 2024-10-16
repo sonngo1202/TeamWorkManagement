@@ -1,12 +1,13 @@
 package com.example.team_work_management.repository;
 
 import com.example.team_work_management.entity.User;
+import com.example.team_work_management.entity.UserGroup;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.Optional;
+import java.util.List;
 
 @Repository
-public interface UserRepository extends JpaRepository<User, Long> {
-    Optional<User> findByEmail(String email);
+public interface IUserGroupRepository extends JpaRepository<UserGroup, Long> {
+    List<UserGroup> findByUser(User user);
 }

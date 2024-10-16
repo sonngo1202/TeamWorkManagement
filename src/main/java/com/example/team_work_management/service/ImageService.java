@@ -4,6 +4,6 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 
 public interface ImageService {
-    BufferedImage createImage(String fullName);
+    BufferedImage createImageUser(String fullName);
     String uploadToFirebase(BufferedImage image) throws IOException;
 }
