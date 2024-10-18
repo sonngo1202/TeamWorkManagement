@@ -1,5 +1,6 @@
 package com.example.team_work_management.service.impl;
 
+import com.example.team_work_management.dto.PasswordChangeRequest;
 import com.example.team_work_management.entity.User;
 import com.example.team_work_management.exception.error.EmailAlreadyExistsException;
 import com.example.team_work_management.exception.error.EmailNotFoundException;
@@ -15,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -27,6 +29,11 @@ import java.util.Random;
 
 @Service
 public class AuthServiceImpl implements AuthService {
+
+    private final String titleVC = "Verify Code";
+    private final String bodyVC = "Your verification code is: ";
+    private final String titlePRC = "Password Reset Code";
+    private final String bodyPRC = "Your password reset code is: ";
 
     @Autowired
     private IUserRepository userRepository;
@@ -71,22 +78,20 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public boolean retrieveCode(User user) {
+    public void retrieveCode(User user) {
         User userPre = userRepository.findByEmail(user.getEmail())
-                .orElseThrow(() -> new EmailNotFoundException("Email not found"));
+                .orElseThrow(() -> new EmailNotFoundException("Email is incorrect"));
         userPre.setCode(generateVerifyCode());
         userPre.setExpiresAt(LocalDateTime.now().plusMinutes(10));
 
         userRepository.save(userPre);
-        emailService.sendSimpleMessage(user.getEmail(), "Verify Code", "Your verification code is: " + userPre.getCode());
-
-        return true;
+        emailService.sendSimpleMessage(user.getEmail(), titleVC, bodyVC + userPre.getCode());
     }
 
     @Override
     public boolean isVerificationCodeValid(User user) throws IOException {
         User userPre = userRepository.findByEmail(user.getEmail())
-                .orElseThrow(() -> new EmailNotFoundException("Email not found"));
+                .orElseThrow(() -> new EmailNotFoundException("Email is incorrect"));
 
         if(!userPre.getExpiresAt().isAfter(LocalDateTime.now()) || userPre.isActive()){
             throw new VerificationCodeExpiredException("Verification code expired");
@@ -123,13 +128,70 @@ public class AuthServiceImpl implements AuthService {
         return true;
     }
 
+    @Override
+    public boolean changePassword(PasswordChangeRequest passwordChangeRequest) {
+        User user = getCurrentAuthenticatedUser();
+
+        if(!passwordEncoder.matches(passwordChangeRequest.getCurrentPassword(), user.getPassword())){
+            throw new IllegalArgumentException("Current password is incorrect");
+        }
+
+        user.setPassword(passwordEncoder.encode(passwordChangeRequest.getNewPassword()));
+        userRepository.save(user);
+
+        return true;
+    }
+
+    @Override
+    public void generatePasswordResetCode(User user) {
+        User userRP = userRepository.findByEmailAndIsActiveTrue(user.getEmail())
+                .orElseThrow(() -> new EmailNotFoundException("User not found"));
+        userRP.setCode(generateVerifyCode());
+        userRP.setExpiresAt(LocalDateTime.now().plusMinutes(10));
+
+        userRepository.save(userRP);
+        emailService.sendSimpleMessage(user.getEmail(), titlePRC, bodyPRC + userRP.getCode());
+    }
+
+    @Override
+    public boolean restPassword(User user) {
+        User userPR = userRepository.findByEmailAndIsActiveTrue(user.getEmail())
+                .orElseThrow(() -> new EmailNotFoundException("User not found"));
+
+        if(!userPR.getExpiresAt().isAfter(LocalDateTime.now())){
+            throw new VerificationCodeExpiredException("Password reset code expired");
+        }
+
+        if(!userPR.getCode().equals(user.getCode())){
+            throw new InvalidVerificationCodeException("Invalid password reset code");
+        }
+
+        userPR.setPassword(passwordEncoder.encode(user.getPassword()));
+        userRepository.save(userPR);
+
+        return true;
+    }
+
+    @Override
+    public boolean updateUser(User user) {
+        User userUpdate = getCurrentAuthenticatedUser();
+
+        userUpdate.setFullName(user.getFullName());
+        userUpdate.setJob(user.getJob());
+        userUpdate.setLocation(user.getLocation());
+
+        userRepository.save(userUpdate);
+
+        return true;
+    }
+
     private void processRegistration(User user){
         user.setCode(generateVerifyCode());
         user.setExpiresAt(LocalDateTime.now().plusMinutes(10));
         user.setPassword(passwordEncoder.encode(user.getPassword()));
 
         userRepository.save(user);
-        emailService.sendSimpleMessage(user.getEmail(), "Verify Code", "Your verification code is: " + user.getCode());
+        emailService.sendSimpleMessage(user.getEmail(), titleVC, bodyVC + user.getCode());
     }
 
     private String generateVerifyCode(){
@@ -151,6 +213,13 @@ public class AuthServiceImpl implements AuthService {
         }catch (BadCredentialsException e){
             throw new BadCredentialsException("Incorrect email or password");
         }
+    }
+
+    private User getCurrentAuthenticatedUser(){
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        return userRepository.findByEmailAndIsActiveTrue(email)
+                .orElseThrow(() -> new EmailNotFoundException("User not found"));
     }
 
 }

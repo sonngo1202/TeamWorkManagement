@@ -1,5 +1,6 @@
 package com.example.team_work_management.controller;
 
+import com.example.team_work_management.dto.PasswordChangeRequest;
 import com.example.team_work_management.entity.User;
 import com.example.team_work_management.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.security.Principal;
 
 @RestController
 @CrossOrigin
@@ -39,4 +41,29 @@ public class AuthController {
         authService.login(user);
         return ResponseEntity.ok(user);
     }
+
+    @PostMapping("/change-password")
+    public ResponseEntity<?> changePassword(@RequestBody PasswordChangeRequest passwordChangeRequest){
+        authService.changePassword(passwordChangeRequest);
+        return ResponseEntity.ok("Change password successful");
+    }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<?> forgotPassword(@RequestBody User user){
+        authService.generatePasswordResetCode(user);
+        return ResponseEntity.ok("Password reset code sent to your email");
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(@RequestBody User user){
+        authService.restPassword(user);
+        return ResponseEntity.ok("Password reset successful");
+    }
+
+    @PutMapping("/update")
+    public ResponseEntity<?> updateUser(@RequestBody User user){
+        authService.updateUser(user);
+        return ResponseEntity.ok("User updated successfully");
+    }
+
 }

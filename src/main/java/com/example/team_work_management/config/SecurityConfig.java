@@ -46,7 +46,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity httpSecurity) throws Exception{
         httpSecurity.csrf().disable()
-                .authorizeRequests().antMatchers("/auth/login", "/auth/register", "/auth/re-code", "/auth/verify").permitAll()
+                .authorizeRequests().antMatchers("/auth/login", "/auth/register", "/auth/re-code", "/auth/verify", "/auth/forgot-password", "/auth/reset-password").permitAll()
                 .anyRequest().authenticated();
 
         httpSecurity.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
