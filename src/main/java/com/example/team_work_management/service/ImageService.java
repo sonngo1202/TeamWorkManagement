@@ -6,4 +6,5 @@ import java.io.IOException;
 public interface ImageService {
     BufferedImage createImageUser(String fullName);
     String uploadToFirebase(BufferedImage image) throws IOException;
+    BufferedImage createImageGroup();
 }

@@ -14,4 +14,5 @@ public interface AuthService {
     void generatePasswordResetCode(User user);
     boolean restPassword(User user);
     boolean updateUser(User user);
+    User getCurrentAuthenticatedUser();
 }

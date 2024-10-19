@@ -26,16 +26,12 @@ public class ImageServiceImpl implements ImageService {
         int height = 200;
 
         //Create image background white
-        BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+        BufferedImage image = createBackground(width, height, Color.WHITE);
         Graphics2D g2d = image.createGraphics();
-
-        //Set background white
-        g2d.setColor(Color.WHITE);
-        g2d.fillRect(0, 0, width, height);
 
         //Set font text and color text
         g2d.setFont(new Font("Arial", Font.BOLD, 80));
-        g2d.setColor(generateTextColor());
+        g2d.setColor(generateColor());
 
         //Get size text
         FontMetrics fm = g2d.getFontMetrics();
@@ -70,20 +66,39 @@ public class ImageServiceImpl implements ImageService {
         return fileName;
     }
 
+    @Override
+    public BufferedImage createImageGroup() {
+        //Size image
+        int width = 200;
+        int height = 200;
+
+        return createBackground(width, height, generateColor());
+    }
+
     private String getInitials(String fullName){
         String[] names = fullName.split("\\s+");
         return names[0].substring(0,1).toUpperCase() + names[names.length-1].substring(0,1).toUpperCase();
     }
 
-    private Color generateTextColor(){
+    private Color generateColor(){
         Random random = new Random();
         int r, g, b;
         do {
-            r = random.nextInt(201);
-            g = random.nextInt(201);
-            b = random.nextInt(201);
-        } while (r > 200 && g > 200 && b > 200);
+            r = random.nextInt(156) + 50;
+            g = random.nextInt(156) + 50;
+            b = random.nextInt(156) + 50;
+        } while (r + g + b > 600 || r + g + b < 150);
 
         return new Color(r, g, b);
+    }
+
+    private BufferedImage createBackground(int width, int height, Color bgColor) {
+        BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+        Graphics2D g2d = image.createGraphics();
+
+        g2d.setColor(bgColor);
+        g2d.fillRect(0, 0, width, height);
+        g2d.dispose();
+        return image;
     }
 }

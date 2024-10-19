@@ -185,6 +185,14 @@ public class AuthServiceImpl implements AuthService {
         return true;
     }
 
+    @Override
+    public User getCurrentAuthenticatedUser(){
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        return userRepository.findByEmailAndIsActiveTrue(email)
+                .orElseThrow(() -> new EmailNotFoundException("User not found"));
+    }
+
     private void processRegistration(User user){
         user.setCode(generateVerifyCode());
         user.setExpiresAt(LocalDateTime.now().plusMinutes(10));
@@ -213,13 +221,6 @@ public class AuthServiceImpl implements AuthService {
         }catch (BadCredentialsException e){
             throw new BadCredentialsException("Incorrect email or password");
         }
-    }
-
-    private User getCurrentAuthenticatedUser(){
-        String email = SecurityContextHolder.getContext().getAuthentication().getName();
-
-        return userRepository.findByEmailAndIsActiveTrue(email)
-                .orElseThrow(() -> new EmailNotFoundException("User not found"));
     }
 
 }

@@ -9,11 +9,11 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Entity
-@Table(name = "group")
+@Table(name = "`group`")
 @Setter
-@Getter
 public class Group {
 
+    @Getter
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
