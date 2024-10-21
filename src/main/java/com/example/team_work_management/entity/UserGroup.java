@@ -1,10 +1,7 @@
 package com.example.team_work_management.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -13,6 +10,7 @@ import java.time.LocalDateTime;
 @Table(name = "user_group")
 @Builder
 @Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserGroup {
@@ -34,4 +32,11 @@ public class UserGroup {
 
     @Column(name = "joined_at", nullable = false)
     private LocalDateTime joinedAt;
+
+    @Column(name = "removed_at")
+    private LocalDateTime removedAt;
+
+    @JsonIgnore
+    @Column(name = "is_active", nullable = false)
+    private boolean isActive;
 }

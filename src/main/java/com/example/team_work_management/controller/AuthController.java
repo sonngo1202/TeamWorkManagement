@@ -5,6 +5,7 @@ import com.example.team_work_management.entity.User;
 import com.example.team_work_management.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -37,6 +38,7 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody User user){
+        SecurityContextHolder.clearContext();
         authService.login(user);
         return ResponseEntity.ok(user);
     }
@@ -63,6 +65,11 @@ public class AuthController {
     public ResponseEntity<?> updateUser(@RequestBody User user){
         authService.updateUser(user);
         return ResponseEntity.ok("User updated successfully");
+    }
+
+    @GetMapping("/{key}/group/{groupId}")
+    public ResponseEntity<?> searchByEmailAndGroup(@PathVariable Long groupId, @PathVariable String key){
+        return ResponseEntity.ok(authService.searchByEmailAndGroup(key, groupId));
     }
 
 }

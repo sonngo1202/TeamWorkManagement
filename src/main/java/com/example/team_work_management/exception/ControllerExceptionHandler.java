@@ -34,9 +34,9 @@ public class ControllerExceptionHandler {
         return message;
     }
 
-    @ExceptionHandler(EmailNotFoundException.class)
+    @ExceptionHandler(UserNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErrorMessage handleEmailNotFoundException(EmailNotFoundException ex, WebRequest request){
+    public ErrorMessage handleEmailNotFoundException(UserNotFoundException ex, WebRequest request){
         ErrorMessage message = new ErrorMessage(
                 HttpStatus.NOT_FOUND.value(),
                 new Date(),
@@ -72,6 +72,39 @@ public class ControllerExceptionHandler {
     public ErrorMessage handleInvalidRefreshTokenException(InvalidJwtTokenException ex, WebRequest request){
         ErrorMessage message = new ErrorMessage(
                 HttpStatus.UNAUTHORIZED.value(),
+                new Date(),
+                ex.getMessage(),
+                request.getDescription(false));
+        return message;
+    }
+
+    @ExceptionHandler(UserGroupNotFoundException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public ErrorMessage handleUserGroupNotFoundException(UserGroupNotFoundException ex, WebRequest request){
+        ErrorMessage message = new ErrorMessage(
+                HttpStatus.FORBIDDEN.value(),
+                new Date(),
+                ex.getMessage(),
+                request.getDescription(false));
+        return message;
+    }
+
+    @ExceptionHandler(GroupNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ErrorMessage handGroupNotFoundException(GroupNotFoundException ex, WebRequest request){
+        ErrorMessage message = new ErrorMessage(
+                HttpStatus.NOT_FOUND.value(),
+                new Date(),
+                ex.getMessage(),
+                request.getDescription(false));
+        return message;
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public ErrorMessage handAccessDeniedException(AccessDeniedException ex, WebRequest request){
+        ErrorMessage message = new ErrorMessage(
+                HttpStatus.FORBIDDEN.value(),
                 new Date(),
                 ex.getMessage(),
                 request.getDescription(false));

@@ -1,6 +1,7 @@
 package com.example.team_work_management.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,9 +12,9 @@ import java.util.List;
 @Entity
 @Table(name = "`group`")
 @Setter
+@Getter
 public class Group {
 
-    @Getter
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -34,6 +35,7 @@ public class Group {
     @Column(name = "picture", nullable = false)
     private String picture;
 
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     @OneToMany(mappedBy = "group", fetch = FetchType.LAZY)
     private List<UserGroup> listUserGroup;
 

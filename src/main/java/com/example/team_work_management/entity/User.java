@@ -1,6 +1,7 @@
 package com.example.team_work_management.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
@@ -53,9 +54,12 @@ public class User implements Serializable {
     @Column(name = "expires_at")
     private LocalDateTime expiresAt;
 
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     @Transient
     private String accessToken;
 
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     @Transient
     private String refreshToken;
+
 }

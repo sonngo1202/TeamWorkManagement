@@ -1,17 +1,17 @@
 package com.example.team_work_management.service.impl;
 
 import com.example.team_work_management.dto.PasswordChangeRequest;
+import com.example.team_work_management.entity.Group;
 import com.example.team_work_management.entity.User;
-import com.example.team_work_management.exception.error.EmailAlreadyExistsException;
-import com.example.team_work_management.exception.error.EmailNotFoundException;
-import com.example.team_work_management.exception.error.InvalidVerificationCodeException;
-import com.example.team_work_management.exception.error.VerificationCodeExpiredException;
+import com.example.team_work_management.entity.UserGroup;
+import com.example.team_work_management.exception.error.*;
 import com.example.team_work_management.repository.IUserRepository;
 import com.example.team_work_management.security.CustomUserDetailService;
 import com.example.team_work_management.security.JwtUtil;
 import com.example.team_work_management.service.AuthService;
 import com.example.team_work_management.service.EmailService;
 import com.example.team_work_management.service.ImageService;
+import com.example.team_work_management.service.UserGroupService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -24,6 +24,7 @@ import org.springframework.stereotype.Service;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 
@@ -34,6 +35,7 @@ public class AuthServiceImpl implements AuthService {
     private final String bodyVC = "Your verification code is: ";
     private final String titlePRC = "Password Reset Code";
     private final String bodyPRC = "Your password reset code is: ";
+    private final String role_Manager = "MANAGER";
 
     @Autowired
     private IUserRepository userRepository;
@@ -49,6 +51,9 @@ public class AuthServiceImpl implements AuthService {
 
     @Autowired
     private AuthenticationManager authenticationManager;
+
+    @Autowired
+    private UserGroupService userGroupService;
 
     @Autowired
     private EmailService emailService;
@@ -80,7 +85,7 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public void retrieveCode(User user) {
         User userPre = userRepository.findByEmail(user.getEmail())
-                .orElseThrow(() -> new EmailNotFoundException("Email is incorrect"));
+                .orElseThrow(() -> new UserNotFoundException("Email is incorrect"));
         userPre.setCode(generateVerifyCode());
         userPre.setExpiresAt(LocalDateTime.now().plusMinutes(10));
 
@@ -91,7 +96,7 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public boolean isVerificationCodeValid(User user) throws IOException {
         User userPre = userRepository.findByEmail(user.getEmail())
-                .orElseThrow(() -> new EmailNotFoundException("Email is incorrect"));
+                .orElseThrow(() -> new UserNotFoundException("Email is incorrect"));
 
         if(!userPre.getExpiresAt().isAfter(LocalDateTime.now()) || userPre.isActive()){
             throw new VerificationCodeExpiredException("Verification code expired");
@@ -145,7 +150,7 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public void generatePasswordResetCode(User user) {
         User userRP = userRepository.findByEmailAndIsActiveTrue(user.getEmail())
-                .orElseThrow(() -> new EmailNotFoundException("User not found"));
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
         userRP.setCode(generateVerifyCode());
         userRP.setExpiresAt(LocalDateTime.now().plusMinutes(10));
 
@@ -156,7 +161,7 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public boolean restPassword(User user) {
         User userPR = userRepository.findByEmailAndIsActiveTrue(user.getEmail())
-                .orElseThrow(() -> new EmailNotFoundException("User not found"));
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
 
         if(!userPR.getExpiresAt().isAfter(LocalDateTime.now())){
             throw new VerificationCodeExpiredException("Password reset code expired");
@@ -188,9 +193,29 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public User getCurrentAuthenticatedUser(){
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
-
         return userRepository.findByEmailAndIsActiveTrue(email)
-                .orElseThrow(() -> new EmailNotFoundException("User not found"));
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
+    }
+
+    @Override
+    public boolean isManagerOfGroup(User user, Group group) {
+        UserGroup userGroup = userGroupService.get(user, group);
+        if(userGroup == null){
+            throw new UserGroupNotFoundException("User not in group");
+        }
+
+        return role_Manager.equalsIgnoreCase(userGroup.getRole());
+    }
+
+    @Override
+    public User getDetail(Long id) {
+        return userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
+    }
+
+    @Override
+    public List<User> searchByEmailAndGroup(String key, Long groupId) {
+        return userRepository.findByEmailNotInGroup(key, groupId);
     }
 
     private void processRegistration(User user){

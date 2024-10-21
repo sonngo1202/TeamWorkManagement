@@ -1,9 +1,11 @@
 package com.example.team_work_management.service;
 
 import com.example.team_work_management.dto.PasswordChangeRequest;
+import com.example.team_work_management.entity.Group;
 import com.example.team_work_management.entity.User;
 
 import java.io.IOException;
+import java.util.List;
 
 public interface AuthService {
     boolean register(User user);
@@ -15,4 +17,7 @@ public interface AuthService {
     boolean restPassword(User user);
     boolean updateUser(User user);
     User getCurrentAuthenticatedUser();
+    boolean isManagerOfGroup(User user, Group group);
+    User getDetail(Long id);
+    List<User> searchByEmailAndGroup(String key, Long groupId);
 }
