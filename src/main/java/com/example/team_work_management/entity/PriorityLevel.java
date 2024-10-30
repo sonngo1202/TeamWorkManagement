@@ -9,17 +9,22 @@ import lombok.Setter;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "status")
+@Table(name = "priority_level")
 @Getter
 @Setter
 @Builder
-public class Status {
+public class PriorityLevel {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @JsonView(Views.Summary.class)
+    @JsonView({Views.Summary.class})
     private Long id;
 
     @Column(name = "name")
-    @JsonView(Views.Summary.class)
+    @JsonView({Views.Summary.class})
     private String name;
+
+    @Column(name = "level")
+    @JsonView({Views.Summary.class})
+    private int level;
 }

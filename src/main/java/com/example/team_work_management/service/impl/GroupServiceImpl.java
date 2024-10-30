@@ -38,7 +38,7 @@ public class GroupServiceImpl implements GroupService {
     private ImageService imageService;
 
     @Autowired
-    private EmailService emailService;
+    private WorkGroupService workGroupService;
 
     @Override
     @Transactional
@@ -69,14 +69,8 @@ public class GroupServiceImpl implements GroupService {
     @Override
     @Transactional
     public boolean edit(Group group, Long id) {
-        User user = authService.getCurrentAuthenticatedUser();
 
-        Group updateGroup = groupRepository.findById(id)
-                .orElseThrow(() -> new GroupNotFoundException("Group not found"));
-
-        if(!authService.isManagerOfGroup(user, updateGroup)){
-            throw new AccessDeniedException("You do not have permission to edit this group");
-        }
+        Group updateGroup = getById(id);
 
         updateGroup.setName(group.getName());
         updateGroup.setDes(group.getDes());
@@ -87,14 +81,7 @@ public class GroupServiceImpl implements GroupService {
     @Override
     @Transactional
     public boolean delete(Long id) {
-        User user = authService.getCurrentAuthenticatedUser();
-
-        Group existingGroup = groupRepository.findById(id)
-                .orElseThrow(() -> new GroupNotFoundException("Group not found"));
-
-        if(!authService.isManagerOfGroup(user, existingGroup)){
-            throw new AccessDeniedException("You do not have permission to edit this group");
-        }
+        Group existingGroup = getById(id);
 
         existingGroup.setClosed(true);
         groupRepository.save(existingGroup);
@@ -109,82 +96,22 @@ public class GroupServiceImpl implements GroupService {
 
         List<UserGroup> userGroups = userGroupService.getByUser(user);
         return userGroups.stream()
-                .map(userGroup -> {
-                    Group group = userGroup.getGroup();
-                    group.setListUserGroup(null);
-                    return group;
-                }).collect(Collectors.toList());
-    }
-
-    @Override
-    @Transactional
-    public boolean addMember(Long idUser, Long id) {
-        User user = authService.getCurrentAuthenticatedUser();
-
-        Group group = groupRepository.findById(id)
-                .orElseThrow(() -> new GroupNotFoundException("Group not found"));
-
-        if(!authService.isManagerOfGroup(user, group)){
-            throw new AccessDeniedException("You do not have permission to edit this group");
-        }
-
-        User member = authService.getDetail(idUser);
-
-        if(userGroupService.get(member, group) != null){
-            return false;
-        }
-
-        UserGroup userGroup = UserGroup.builder()
-                .user(member)
-                .group(group)
-                .role("MEMBER")
-                .joinedAt(LocalDateTime.now())
-                .isActive(true)
-                .build();
-
-        userGroupService.save(userGroup);
-
-        return true;
-    }
-
-    @Override
-    @Transactional
-    public boolean removeMember(Long id, Long idUser) {
-        User user = authService.getCurrentAuthenticatedUser();
-
-        Group group = groupRepository.findById(id)
-                .orElseThrow(() -> new GroupNotFoundException("Group not found"));
-
-        if(!authService.isManagerOfGroup(user, group)){
-            throw new AccessDeniedException("You do not have permission to edit this group");
-        }
-
-        User member = authService.getDetail(idUser);
-        UserGroup userGroup = userGroupService.get(member, group);
-
-        if(userGroup == null || userGroup.getRole().equalsIgnoreCase(role_Manager)){
-            return false;
-        }
-
-        userGroup.setActive(false);
-        userGroup.setRemovedAt(LocalDateTime.now());
-        userGroupService.save(userGroup);
-
-        return true;
+                .map(UserGroup::getGroup).collect(Collectors.toList());
     }
 
     @Override
     @Transactional
     public Group getDetail(Long id) {
-
-        User user = authService.getCurrentAuthenticatedUser();
         Group group = groupRepository.findByIdWithUserGroups(id)
                 .orElseThrow(() -> new GroupNotFoundException("Group not found"));
-
-        if(userGroupService.get(user, group) == null){
-            throw new GroupNotFoundException("Group not found");
-        }
-
+        group.setListWorkGroup(workGroupService.getByGroupId(id));
         return group;
     }
+
+    @Override
+    public Group getById(Long id) {
+        return groupRepository.findById(id)
+                .orElseThrow(() -> new GroupNotFoundException("Group not found"));
+    }
+
 }

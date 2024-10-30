@@ -24,9 +24,11 @@ import org.springframework.stereotype.Service;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 @Service
 public class AuthServiceImpl implements AuthService {
@@ -129,6 +131,10 @@ public class AuthServiceImpl implements AuthService {
         user.setLocation(info.getLocation());
         user.setAccessToken(jwtUtil.generateToken(userDetails));
         user.setRefreshToken(jwtUtil.generateRefreshToken(userDetails));
+        List<UserGroup> activeRoles = info.getRoles().stream()
+                .filter(UserGroup::isActive)
+                .collect(Collectors.toList());
+        user.setRoles(activeRoles);
 
         return true;
     }
@@ -198,16 +204,6 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public boolean isManagerOfGroup(User user, Group group) {
-        UserGroup userGroup = userGroupService.get(user, group);
-        if(userGroup == null){
-            throw new UserGroupNotFoundException("User not in group");
-        }
-
-        return role_Manager.equalsIgnoreCase(userGroup.getRole());
-    }
-
-    @Override
     public User getDetail(Long id) {
         return userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
@@ -215,7 +211,16 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public List<User> searchByEmailAndGroup(String key, Long groupId) {
-        return userRepository.findByEmailNotInGroup(key, groupId);
+        List<Object[]> results = userRepository.findWithGroupStatus(key, groupId);
+        List<User> users = new ArrayList<>();
+
+        for (Object[] result : results) {
+            User user = (User) result[0];
+            boolean isInGroup = (Boolean) result[1];
+            user.setInGroup(isInGroup);
+            users.add(user);
+        }
+        return users;
     }
 
     private void processRegistration(User user){

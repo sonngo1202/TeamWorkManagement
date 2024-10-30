@@ -1,8 +1,10 @@
 package com.example.team_work_management.controller;
 
+import com.example.team_work_management.config.Views;
 import com.example.team_work_management.dto.PasswordChangeRequest;
 import com.example.team_work_management.entity.User;
 import com.example.team_work_management.service.AuthService;
+import com.fasterxml.jackson.annotation.JsonView;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -37,6 +39,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
+    @JsonView(Views.UserLogin.class)
     public ResponseEntity<?> login(@RequestBody User user){
         SecurityContextHolder.clearContext();
         authService.login(user);

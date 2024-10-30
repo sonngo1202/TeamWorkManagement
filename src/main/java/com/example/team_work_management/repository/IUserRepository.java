@@ -14,6 +14,8 @@ public interface IUserRepository extends JpaRepository<User, Long> {
     Optional<User> findByEmail(String email);
     Optional<User> findByEmailAndIsActiveTrue(String email);
 
-    @Query("SELECT u FROM User u WHERE u.email LIKE %:key% AND u.id NOT IN (SELECT ug.user.id FROM UserGroup ug WHERE ug.group.id = :groupId)")
-    List<User> findByEmailNotInGroup(@Param("key") String key, @Param("groupId") Long groupId);
+    @Query("SELECT u, CASE WHEN COUNT(ug) > 0 THEN true ELSE false END AS isInGroup " +
+            "FROM User u LEFT JOIN UserGroup ug ON u.id = ug.user.id AND ug.group.id = :groupId " +
+            "WHERE u.email LIKE %:key% GROUP BY u.id")
+    List<Object[]> findWithGroupStatus(@Param("key") String key, @Param("groupId") Long groupId);
 }

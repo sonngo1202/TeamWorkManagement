@@ -33,15 +33,15 @@ public class UserGroupServiceImpl implements UserGroupService {
         return userGroupRepository.findByUserAndIsActiveTrue(user);
     }
 
+
     @Override
-    public List<UserGroup> getByGroup(Group group) {
-        return userGroupRepository.findByGroupAndIsActiveTrue(group);
+    public boolean hasRoleInGroup(Long groupId, String role, Long userId) {
+        return userGroupRepository.existsByGroupIdAndUserIdAndRoleAndIsActiveTrue(groupId, userId, role);
     }
 
     @Override
-    public boolean add(UserGroup userGroup) {
-        userGroupRepository.save(userGroup);
-        return true;
+    public boolean hasInGroup(Long groupId, Long userId) {
+        return userGroupRepository.existsByGroupIdAndUserIdAndIsActiveTrue(groupId, userId);
     }
 
 }

@@ -17,7 +17,6 @@ public interface AuthService {
     boolean restPassword(User user);
     boolean updateUser(User user);
     User getCurrentAuthenticatedUser();
-    boolean isManagerOfGroup(User user, Group group);
     User getDetail(Long id);
     List<User> searchByEmailAndGroup(String key, Long groupId);
 }

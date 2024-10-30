@@ -10,6 +10,6 @@ public interface UserGroupService {
     boolean save(UserGroup userGroup);
     UserGroup get(User user, Group group);
     List<UserGroup> getByUser(User user);
-    List<UserGroup> getByGroup(Group group);
-    boolean add(UserGroup userGroup);
+    boolean hasRoleInGroup(Long groupId, String role, Long userId);
+    boolean hasInGroup(Long groupId, Long userId);
 }
