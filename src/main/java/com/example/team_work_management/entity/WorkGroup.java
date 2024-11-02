@@ -8,6 +8,7 @@ import lombok.*;
 
 import javax.persistence.*;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "work_group")
@@ -39,4 +40,13 @@ public class WorkGroup {
     @JoinColumn(name = "group_id", nullable = false)
     @JsonView(Views.NotificationDetail.class)
     private Group group;
+
+    @PostLoad
+    public void filterTask(){
+        if(listTask != null){
+            listTask = listTask.stream()
+                    .filter(task -> task.getParentTask() == null)
+                    .collect(Collectors.toList());
+        }
+    }
 }

@@ -1,11 +1,9 @@
 package com.example.team_work_management.entity;
 
 import com.example.team_work_management.config.Views;
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonView;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 
@@ -14,20 +12,24 @@ import javax.persistence.*;
 @Builder
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class Tag {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(name = "position", nullable = false)
+    @JsonView(Views.Summary.class)
     private int position;
 
     @ManyToOne
     @JoinColumn(name = "comment_id", nullable = false)
-    @JsonIgnore
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private Comment comment;
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
+    @JsonView(Views.Summary.class)
     private User user;
 }

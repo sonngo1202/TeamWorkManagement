@@ -29,10 +29,6 @@ public class Notification {
     @JsonView(Views.NotificationDetail.class)
     private LocalDateTime createdAt;
 
-    @Column(name = "is_deleted", nullable = false)
-    @JsonView(Views.NotificationDetail.class)
-    private boolean isDeleted;
-
     @ManyToOne
     @JoinColumn(name = "task_id", nullable = false)
     @JsonView(Views.NotificationDetail.class)
@@ -46,4 +42,8 @@ public class Notification {
     @Transient
     @JsonView(Views.NotificationDetail.class)
     private boolean isRead;
+
+    @Transient
+    @JsonView(Views.NotificationDetail.class)
+    private boolean isDeleted;
 }

@@ -28,4 +28,7 @@ public class NotificationReadStatus {
 
     @Column(name = "is_read", nullable = false)
     private boolean isRead;
+
+    @Column(name = "is_deleted", nullable = false)
+    private boolean isDeleted;
 }

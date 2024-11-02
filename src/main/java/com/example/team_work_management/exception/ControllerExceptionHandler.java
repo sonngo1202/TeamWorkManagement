@@ -84,7 +84,7 @@ public class ControllerExceptionHandler {
 
     @ExceptionHandler(GroupNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErrorMessage handGroupNotFoundException(GroupNotFoundException ex, WebRequest request){
+    public ErrorMessage handleGroupNotFoundException(GroupNotFoundException ex, WebRequest request){
         return new ErrorMessage(
                 HttpStatus.NOT_FOUND.value(),
                 new Date(),
@@ -94,7 +94,7 @@ public class ControllerExceptionHandler {
 
     @ExceptionHandler(AccessDeniedException.class)
     @ResponseStatus(HttpStatus.FORBIDDEN)
-    public ErrorMessage handAccessDeniedException(AccessDeniedException ex, WebRequest request){
+    public ErrorMessage handleAccessDeniedException(AccessDeniedException ex, WebRequest request){
         return new ErrorMessage(
                 HttpStatus.FORBIDDEN.value(),
                 new Date(),
@@ -104,7 +104,47 @@ public class ControllerExceptionHandler {
 
     @ExceptionHandler(WorkGroupNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErrorMessage handWorkGroupNotFoundException(WorkGroupNotFoundException ex, WebRequest request){
+    public ErrorMessage handleWorkGroupNotFoundException(WorkGroupNotFoundException ex, WebRequest request){
+        return new ErrorMessage(
+                HttpStatus.NOT_FOUND.value(),
+                new Date(),
+                ex.getMessage(),
+                request.getDescription(false));
+    }
+
+    @ExceptionHandler(TaskNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ErrorMessage handleTaskNotFoundException(TaskNotFoundException ex, WebRequest request){
+        return new ErrorMessage(
+                HttpStatus.NOT_FOUND.value(),
+                new Date(),
+                ex.getMessage(),
+                request.getDescription(false));
+    }
+
+    @ExceptionHandler(PriorityLevelNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ErrorMessage handlePriorityLevelNotFoundException(PriorityLevelNotFoundException ex, WebRequest request){
+        return new ErrorMessage(
+                HttpStatus.NOT_FOUND.value(),
+                new Date(),
+                ex.getMessage(),
+                request.getDescription(false));
+    }
+
+    @ExceptionHandler(StatusNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ErrorMessage handleStatusNotFoundException(StatusNotFoundException ex, WebRequest request){
+        return new ErrorMessage(
+                HttpStatus.NOT_FOUND.value(),
+                new Date(),
+                ex.getMessage(),
+                request.getDescription(false));
+    }
+
+    @ExceptionHandler(CommentNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ErrorMessage handleCommentNotFoundException(CommentNotFoundException ex, WebRequest request){
         return new ErrorMessage(
                 HttpStatus.NOT_FOUND.value(),
                 new Date(),

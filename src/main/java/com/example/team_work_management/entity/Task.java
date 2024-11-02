@@ -2,11 +2,9 @@ package com.example.team_work_management.entity;
 
 import com.example.team_work_management.config.Views;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonView;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalDate;
@@ -17,6 +15,8 @@ import java.util.List;
 @Getter
 @Setter
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Task {
 
     @Id
@@ -44,6 +44,10 @@ public class Task {
     @JsonView(Views.Detailed.class)
     private String des;
 
+    @Column(name = "is_deleted")
+    @JsonIgnore
+    private boolean isDeleted;
+
     @ManyToOne
     @JoinColumn(name = "priority_level_id", nullable = false)
     @JsonView(Views.Detailed.class)
@@ -61,7 +65,7 @@ public class Task {
 
     @ManyToOne
     @JoinColumn(name = "parent_task_id")
-    @JsonIgnore
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private Task parentTask;
 
     @OneToMany(mappedBy = "parentTask")
@@ -76,4 +80,8 @@ public class Task {
     @JoinColumn(name = "work_group_id", nullable = false)
     @JsonView(Views.NotificationDetail.class)
     private WorkGroup workGroup;
+
+    @Column(name = "is_delay")
+    @JsonView(Views.Detailed.class)
+    private boolean isDelay;
 }

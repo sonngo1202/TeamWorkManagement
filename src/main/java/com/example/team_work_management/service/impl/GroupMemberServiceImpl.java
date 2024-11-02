@@ -70,6 +70,7 @@ public class GroupMemberServiceImpl implements GroupMemberService {
         return true;
     }
 
+    @Transactional
     @Override
     public boolean addRoleOfMember(Long idUser, Long id, UserGroup userGroupData) {
         Group group = groupService.getById(id);

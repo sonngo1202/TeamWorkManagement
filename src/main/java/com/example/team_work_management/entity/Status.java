@@ -2,9 +2,7 @@ package com.example.team_work_management.entity;
 
 import com.example.team_work_management.config.Views;
 import com.fasterxml.jackson.annotation.JsonView;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 
@@ -13,6 +11,8 @@ import javax.persistence.*;
 @Getter
 @Setter
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Status {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
