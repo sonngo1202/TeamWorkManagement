@@ -9,4 +9,5 @@ import java.util.Optional;
 @Repository
 public interface ITaskRepository extends JpaRepository<Task, Long> {
     Optional<Task> findByIdAndIsDeletedFalse(Long id);
+    boolean existsByIdAndAssigneeId(Long id, Long assignee);
 }

@@ -9,6 +9,7 @@ import lombok.*;
 import javax.persistence.*;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "task")
@@ -76,12 +77,26 @@ public class Task {
     @JsonView(Views.TaskDetail.class)
     private List<Comment> listComment;
 
+    @OneToMany(mappedBy = "task", fetch = FetchType.LAZY)
+    @JsonView({Views.TaskDetail.class})
+    private List<Document> listDocument;
+
     @ManyToOne
     @JoinColumn(name = "work_group_id", nullable = false)
     @JsonView(Views.NotificationDetail.class)
     private WorkGroup workGroup;
 
     @Column(name = "is_delay")
+    @JsonProperty("isDelay")
     @JsonView(Views.Detailed.class)
     private boolean isDelay;
+
+    @PostLoad
+    public void filterSubTask(){
+        if(listSubTask != null){
+            listSubTask = listSubTask.stream()
+                    .filter(subTask -> !subTask.isDeleted)
+                    .collect(Collectors.toList());
+        }
+    }
 }

@@ -29,7 +29,7 @@ public class CommentServiceImpl implements CommentService {
     private TaskInterestService taskInterestService;
 
     @Autowired
-    private SendNotificationService sendNotificationService;
+    private NotificationService notificationService;
 
     @Transactional
     @Override
@@ -50,7 +50,7 @@ public class CommentServiceImpl implements CommentService {
                         .user(tagUser)
                         .build());
 
-                sendNotificationService.send(task, creator, tagUser, "đã nhắc đến bạn");
+                notificationService.send(task, creator, tagUser, "đã nhắc đến bạn");
             }
         }
 
@@ -60,7 +60,7 @@ public class CommentServiceImpl implements CommentService {
                             .user(creator)
                             .build());
         }
-        sendNotificationService.sendGroup(task, creator, taskInterestService.getByTaskAndExcludeUser(TaskInterest.builder().task(task).user(creator).build()), "đã thêm bình luận mới");
+        notificationService.sendGroup(task, creator, taskInterestService.getByTaskAndExcludeUser(TaskInterest.builder().task(task).user(creator).build()), "đã thêm bình luận mới");
 
         return true;
     }
@@ -83,11 +83,11 @@ public class CommentServiceImpl implements CommentService {
                         .user(tagUser)
                         .build());
 
-                sendNotificationService.send(editComment.getTask(), editComment.getCreator(), tagUser, "đã nhắc đến bạn");
+                notificationService.send(editComment.getTask(), editComment.getCreator(), tagUser, "đã nhắc đến bạn");
             }
         }
 
-        sendNotificationService.sendGroup(editComment.getTask(), editComment.getCreator(), taskInterestService.getByTaskAndExcludeUser(TaskInterest.builder().task(editComment.getTask()).user(editComment.getCreator()).build()), "đã thêm bình luận mới");
+        notificationService.sendGroup(editComment.getTask(), editComment.getCreator(), taskInterestService.getByTaskAndExcludeUser(TaskInterest.builder().task(editComment.getTask()).user(editComment.getCreator()).build()), "đã thêm bình luận mới");
         return true;
     }
 

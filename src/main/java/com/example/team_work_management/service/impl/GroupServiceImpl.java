@@ -102,10 +102,8 @@ public class GroupServiceImpl implements GroupService {
     @Override
     @Transactional
     public Group getDetail(Long id) {
-        Group group = groupRepository.findByIdWithUserGroups(id)
+        return groupRepository.findByIdWithUserGroups(id)
                 .orElseThrow(() -> new GroupNotFoundException("Group not found"));
-        group.setListWorkGroup(workGroupService.getByGroupId(id));
-        return group;
     }
 
     @Override

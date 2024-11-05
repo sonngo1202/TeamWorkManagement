@@ -1,7 +1,6 @@
 package com.example.team_work_management.entity;
 
 import com.example.team_work_management.config.Views;
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonView;
 import lombok.*;
@@ -45,7 +44,7 @@ public class WorkGroup {
     public void filterTask(){
         if(listTask != null){
             listTask = listTask.stream()
-                    .filter(task -> task.getParentTask() == null)
+                    .filter(task -> task.getParentTask() == null && !task.isDeleted())
                     .collect(Collectors.toList());
         }
     }

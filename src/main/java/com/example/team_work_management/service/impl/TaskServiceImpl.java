@@ -15,6 +15,7 @@ public class TaskServiceImpl implements TaskService {
     private final String content_assignment = "đã giao cho bạn một nhiệm vụ";
     private final String content_edit = "đã chỉnh sửa nhiệm vụ";
     private final String content_delete = "đã thu hồi nhiệm vụ";
+    private final String content_update = "đã cập nhật trạng thái nhiệm vụ";
     private final String content_change_person = "đã giao nhiệm vụ cho thành viên khác";
 
     @Autowired
@@ -39,7 +40,7 @@ public class TaskServiceImpl implements TaskService {
     private TaskInterestService taskInterestService;
 
     @Autowired
-    private SendNotificationService sendNotification;
+    private NotificationService notificationService;
 
     @Override
     public Task getById(Long id) {
@@ -72,7 +73,7 @@ public class TaskServiceImpl implements TaskService {
 
         if(!manager.getId().equals(assignee.getId())){
             taskInterestService.save(TaskInterest.builder().task(saveTask).user(assignee).build());
-            sendNotification.send(saveTask, manager, assignee, content_assignment);
+            notificationService.send(saveTask, manager, assignee, content_assignment);
         }
 
         return true;
@@ -100,7 +101,26 @@ public class TaskServiceImpl implements TaskService {
         taskRepository.save(deleteTask);
 
         User manager = authService.getCurrentAuthenticatedUser();
-        sendNotification.sendGroup(deleteTask, manager, taskInterestService.getByTaskAndExcludeUser(TaskInterest.builder().task(deleteTask).user(manager).build()), content_delete);
+        notificationService.sendGroup(deleteTask, manager, taskInterestService.getByTaskAndExcludeUser(TaskInterest.builder().task(deleteTask).user(manager).build()), content_delete);
+        return true;
+    }
+
+    @Override
+    public boolean isTaskAssignedToUser(Long id, Long assigneeId) {
+        return taskRepository.existsByIdAndAssigneeId(id, assigneeId);
+    }
+
+    @Override
+    public boolean updateStatus(Long id, Long statusId) {
+        Task task = taskRepository.getById(id);
+        Status status_currently = task.getStatus();
+        if(!statusId.equals(status_currently.getId())){
+            task.setStatus(statusService.getById(statusId));
+            taskRepository.save(task);
+            User assignee = authService.getCurrentAuthenticatedUser();
+            notificationService.sendGroup(task, assignee, taskInterestService.getByTaskAndExcludeUser(TaskInterest.builder().task(task).user(assignee).build()), content_update);
+        }
+
         return true;
     }
 
@@ -108,7 +128,7 @@ public class TaskServiceImpl implements TaskService {
     private void processEdit(Task task){
         Task saveTask = taskRepository.save(task);
         User manager = authService.getCurrentAuthenticatedUser();
-        sendNotification.sendGroup(saveTask, manager, taskInterestService.getByTaskAndExcludeUser(TaskInterest.builder().task(saveTask).user(manager).build()), content_edit);
+        notificationService.sendGroup(saveTask, manager, taskInterestService.getByTaskAndExcludeUser(TaskInterest.builder().task(saveTask).user(manager).build()), content_edit);
     }
 
     private void processEdit(Task task, User substitute){
@@ -119,11 +139,11 @@ public class TaskServiceImpl implements TaskService {
         User manager = authService.getCurrentAuthenticatedUser();
         if(!assignee_currently.getId().equals(manager.getId())){
             taskInterestService.delete(TaskInterest.builder().task(saveTask).user(assignee_currently).build());
-            sendNotification.send(task, manager, assignee_currently, content_change_person);
+            notificationService.send(task, manager, assignee_currently, content_change_person);
         }
-        sendNotification.sendGroup(saveTask, manager, taskInterestService.getByTaskAndExcludeUser(TaskInterest.builder().task(saveTask).user(manager).build()), content_edit);
+        notificationService.sendGroup(saveTask, manager, taskInterestService.getByTaskAndExcludeUser(TaskInterest.builder().task(saveTask).user(manager).build()), content_edit);
         if(!substitute.getId().equals(manager.getId())){
-            sendNotification.send(task, manager, substitute, content_assignment);
+            notificationService.send(task, manager, substitute, content_assignment);
             taskInterestService.save(TaskInterest.builder().task(saveTask).user(substitute).build());
         }
 

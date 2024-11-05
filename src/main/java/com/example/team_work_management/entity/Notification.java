@@ -2,9 +2,7 @@ package com.example.team_work_management.entity;
 
 import com.example.team_work_management.config.Views;
 import com.fasterxml.jackson.annotation.JsonView;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -14,6 +12,8 @@ import java.time.LocalDateTime;
 @Setter
 @Getter
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Notification {
 
     @Id
@@ -39,11 +39,4 @@ public class Notification {
     @JsonView(Views.NotificationDetail.class)
     private User creator;
 
-    @Transient
-    @JsonView(Views.NotificationDetail.class)
-    private boolean isRead;
-
-    @Transient
-    @JsonView(Views.NotificationDetail.class)
-    private boolean isDeleted;
 }

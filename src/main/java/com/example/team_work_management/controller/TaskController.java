@@ -46,4 +46,11 @@ public class TaskController {
         taskService.delete(id);
         return ResponseEntity.ok("Task deleted successfully");
     }
+
+    @PreAuthorize("@groupSecurityService.checkUserPermissionForTask(#id, authentication.principal.id)")
+    @PutMapping("/{idGroup}/work-group/{idWG}/tasks/{id}/status/{idStatus}")
+    public ResponseEntity<?> updateStatus(@PathVariable Long id, @PathVariable Long idStatus){
+        taskService.updateStatus(id, idStatus);
+        return ResponseEntity.ok("Task updated status successfully");
+    }
 }

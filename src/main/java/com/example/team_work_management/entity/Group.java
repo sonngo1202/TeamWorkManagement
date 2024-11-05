@@ -10,6 +10,7 @@ import lombok.Setter;
 import javax.persistence.*;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "`group`")
@@ -50,5 +51,14 @@ public class Group {
     @OneToMany(mappedBy = "group", fetch = FetchType.LAZY)
     @JsonView(Views.Detailed.class)
     private List<WorkGroup> listWorkGroup;
+
+    @PostLoad
+    public void filterWorkGroup(){
+        if(listWorkGroup != null){
+             listWorkGroup = listWorkGroup.stream()
+                    .filter(workGroup -> !workGroup.isDeleted())
+                    .collect(Collectors.toList());
+        }
+    }
 
 }
