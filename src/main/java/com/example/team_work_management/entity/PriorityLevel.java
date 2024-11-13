@@ -20,11 +20,11 @@ public class PriorityLevel {
     @JsonView({Views.Summary.class})
     private Long id;
 
-    @Column(name = "name")
+    @Column(name = "name", nullable = false)
     @JsonView({Views.Summary.class})
     private String name;
 
-    @Column(name = "level")
+    @Column(name = "level", nullable = false)
     @JsonView({Views.Summary.class})
     private int level;
 }

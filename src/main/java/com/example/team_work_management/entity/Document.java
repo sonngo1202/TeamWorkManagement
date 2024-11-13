@@ -24,15 +24,15 @@ public class Document {
     @JsonView(Views.Summary.class)
     private Long id;
 
-    @Column(name = "name")
+    @Column(name = "name", nullable = false)
     @JsonView(Views.Summary.class)
     private String name;
 
-    @Column(name = "url")
+    @Column(name = "url", nullable = false)
     @JsonView(Views.Summary.class)
     private String url;
 
-    @Column(name = "upload_at")
+    @Column(name = "upload_at", nullable = false)
     @JsonView(Views.Summary.class)
     private LocalDateTime uploadAt;
 

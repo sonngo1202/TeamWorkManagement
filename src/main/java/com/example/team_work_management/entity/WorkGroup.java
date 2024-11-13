@@ -23,11 +23,11 @@ public class WorkGroup {
     @JsonView(Views.Detailed.class)
     private Long id;
 
-    @Column(name = "name")
+    @Column(name = "name", nullable = false)
     @JsonView(Views.Detailed.class)
     private String name;
 
-    @Column(name = "is_deleted")
+    @Column(name = "is_deleted", nullable = false)
     @JsonIgnore
     private boolean isDeleted;
 

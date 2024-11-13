@@ -45,7 +45,7 @@ public class Task {
     @JsonView(Views.Detailed.class)
     private String des;
 
-    @Column(name = "is_deleted")
+    @Column(name = "is_deleted", nullable = false)
     @JsonIgnore
     private boolean isDeleted;
 
@@ -86,7 +86,7 @@ public class Task {
     @JsonView(Views.NotificationDetail.class)
     private WorkGroup workGroup;
 
-    @Column(name = "is_delay")
+    @Column(name = "is_delay", nullable = false)
     @JsonProperty("isDelay")
     @JsonView(Views.Detailed.class)
     private boolean isDelay;

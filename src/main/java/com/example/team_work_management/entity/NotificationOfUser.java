@@ -9,7 +9,7 @@ import lombok.*;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "notification_read_status")
+@Table(name = "notification_of_user")
 @Getter
 @Setter
 @Builder

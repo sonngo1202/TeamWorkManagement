@@ -19,7 +19,7 @@ public class Status {
     @JsonView(Views.Summary.class)
     private Long id;
 
-    @Column(name = "name")
+    @Column(name = "name", nullable = false)
     @JsonView(Views.Summary.class)
     private String name;
 }
