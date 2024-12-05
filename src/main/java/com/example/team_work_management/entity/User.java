@@ -72,7 +72,7 @@ public class User implements Serializable {
     private String refreshToken;
 
     @OneToMany(mappedBy = "user")
-    @JsonView(Views.UserLogin.class)
+    @JsonView(Views.UserDetailed.class)
     private List<UserGroup> roles;
 
     @Transient

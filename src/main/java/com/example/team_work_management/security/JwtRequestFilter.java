@@ -43,6 +43,14 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             authenticateUser(request, jwtToken, email);
         }
 
+        response.addHeader("Access-Control-Allow-Origin", "*");
+        response.addHeader("Access-Control-Allow-Methods", "DELETE, POST, GET, OPTIONS");
+        response.addHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Requested-With");
+        if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
+            response.setStatus(HttpServletResponse.SC_OK);
+            return;
+        }
+
         filterChain.doFilter(request, response);
     }
 

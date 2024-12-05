@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+
 
 @Service
 public class TaskServiceImpl implements TaskService {
@@ -86,6 +88,11 @@ public class TaskServiceImpl implements TaskService {
         taskEdit.setName(task.getName());
         taskEdit.setDes(task.getDes());
         taskEdit.setPriorityLevel(priorityLevelService.getById(task.getPriorityLevel().getId()));
+        taskEdit.setStartDate(task.getStartDate());
+        taskEdit.setEndDate(task.getEndDate());
+        if(task.getEndDate().isAfter(LocalDate.now())){
+            taskEdit.setDelay(false);
+        }
         if(!task.getAssignee().getId().equals(taskEdit.getAssignee().getId())){
             processEdit(taskEdit, authService.getDetail(task.getAssignee().getId()));
         }else{

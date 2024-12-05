@@ -31,8 +31,8 @@ public class Group {
     @JsonView(Views.Summary.class)
     private LocalDate createAt;
 
-    @JsonIgnore
     @Column(name = "is_closed", nullable = false)
+    @JsonView(Views.Summary.class)
     private boolean isClosed = false;
 
     @Column(name = "des")

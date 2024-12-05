@@ -45,13 +45,14 @@ public class NotificationOfUserServiceImpl implements NotificationOfUserService 
     }
 
     @Override
-    public Task readNotification(Long idNotification, Long idUser) {
+    public boolean readNotification(Long idNotification, Long idUser) {
         NotificationOfUser notificationOfUser = notificationOfUserRepository.findByNotificationIdAndUserId(idNotification, idUser)
                 .orElseThrow(() -> new NotificationOfUserNotFoundException("Notification of user not found"));
         if(!notificationOfUser.isRead()){
             notificationOfUser.setRead(true);
             notificationOfUserRepository.save(notificationOfUser);
+            return true;
         }
-        return notificationOfUser.getNotification().getTask();
+        return false;
     }
 }

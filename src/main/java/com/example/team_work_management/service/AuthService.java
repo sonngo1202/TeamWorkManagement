@@ -12,6 +12,7 @@ public interface AuthService {
     void retrieveCode(User user);
     boolean isVerificationCodeValid(User user) throws IOException;
     boolean login(User user);
+    User getViewDetail(Long id);
     boolean changePassword(PasswordChangeRequest passwordChangeRequest);
     void generatePasswordResetCode(User user);
     boolean restPassword(User user);

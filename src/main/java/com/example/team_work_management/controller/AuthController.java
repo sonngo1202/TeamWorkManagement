@@ -75,4 +75,10 @@ public class AuthController {
         return ResponseEntity.ok(authService.searchByEmailAndGroup(key, groupId));
     }
 
+    @GetMapping("/{id}")
+    @JsonView(Views.UserDetailed.class)
+    public ResponseEntity<?> getDetail(@PathVariable Long id){
+        return ResponseEntity.ok(authService.getViewDetail(id));
+    }
+
 }

@@ -28,7 +28,7 @@ public class UserGroup {
 
     @ManyToOne
     @JoinColumn(name = "group_id", nullable = false)
-    @JsonView(Views.UserLogin.class)
+    @JsonView(Views.UserDetailed.class)
     private Group group;
 
     @Column(name = "role", nullable = false)

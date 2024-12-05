@@ -28,10 +28,10 @@ public class NotificationOfUserController {
         return ResponseEntity.ok(notificationOfUserService.getByIsNotDelete(user.getId()));
     }
 
-    @GetMapping("/{idUser}/notifications/{id}")
-    @JsonView(Views.TaskDetail.class)
-    public ResponseEntity<?> getDetail(@AuthenticationPrincipal CustomUserDetails user, @PathVariable Long id){
-        return ResponseEntity.ok(notificationOfUserService.readNotification(id, user.getId()));
+    @PutMapping("/{idUser}/notifications/{id}")
+    public ResponseEntity<?> markNotificationAsRead(@AuthenticationPrincipal CustomUserDetails user, @PathVariable Long id){
+        notificationOfUserService.readNotification(id, user.getId());
+        return ResponseEntity.ok("Thông báo đã được đọc");
     }
 
     @DeleteMapping("/{idUser}/notifications/{id}")

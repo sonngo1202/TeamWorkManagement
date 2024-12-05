@@ -124,19 +124,21 @@ public class AuthServiceImpl implements AuthService {
 
         final UserDetails userDetails = customUserDetailService.loadUserByUsername(user.getEmail());
         final User info = userRepository.findByEmailAndIsActiveTrue(user.getEmail()).get();
-
-        user.setPicture(info.getPicture());
-        user.setFullName(info.getFullName());
-        user.setJob(info.getJob());
-        user.setLocation(info.getLocation());
+        user.setId(info.getId());
         user.setAccessToken(jwtUtil.generateToken(userDetails));
         user.setRefreshToken(jwtUtil.generateRefreshToken(userDetails));
-        List<UserGroup> activeRoles = info.getRoles().stream()
+
+        return true;
+    }
+
+    @Override
+    public User getViewDetail(Long id) {
+        User user = getDetail(id);
+        List<UserGroup> activeRoles = user.getRoles().stream()
                 .filter(UserGroup::isActive)
                 .collect(Collectors.toList());
         user.setRoles(activeRoles);
-
-        return true;
+        return user;
     }
 
     @Override

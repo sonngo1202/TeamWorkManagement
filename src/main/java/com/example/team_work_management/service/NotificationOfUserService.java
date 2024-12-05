@@ -10,5 +10,5 @@ public interface NotificationOfUserService {
     boolean delete(Long idNotification, Long idUser);
     List<NotificationOfUser> getByIsNotDelete(Long idUser);
     List<NotificationOfUser> getByIsDeleted(Long idUser);
-    Task readNotification(Long idNotification, Long idUser);
+    boolean readNotification(Long idNotification, Long idUser);
 }
