@@ -3,10 +3,13 @@ package com.example.team_work_management.controller;
 import com.example.team_work_management.config.Views;
 import com.example.team_work_management.dto.PasswordChangeRequest;
 import com.example.team_work_management.entity.User;
+import com.example.team_work_management.security.CustomUserDetails;
 import com.example.team_work_management.service.AuthService;
+import com.example.team_work_management.service.TaskService;
 import com.fasterxml.jackson.annotation.JsonView;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,6 +22,9 @@ public class AuthController {
 
     @Autowired
     private AuthService authService;
+
+    @Autowired
+    private TaskService taskService;
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody User user){
@@ -79,6 +85,12 @@ public class AuthController {
     @JsonView(Views.UserDetailed.class)
     public ResponseEntity<?> getDetail(@PathVariable Long id){
         return ResponseEntity.ok(authService.getViewDetail(id));
+    }
+
+    @GetMapping("/tasks")
+    @JsonView(Views.Detailed.class)
+    public ResponseEntity<?> getAllTask(@AuthenticationPrincipal CustomUserDetails user){
+        return ResponseEntity.ok(taskService.getByAssignee(user.getId()));
     }
 
 }

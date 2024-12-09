@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.List;
 
 
 @Service
@@ -122,13 +123,22 @@ public class TaskServiceImpl implements TaskService {
         Task task = taskRepository.getById(id);
         Status status_currently = task.getStatus();
         if(!statusId.equals(status_currently.getId())){
-            task.setStatus(statusService.getById(statusId));
+            Status status_update = statusService.getById(statusId);
+            task.setStatus(status_update);
+            if(status_update.getName().equalsIgnoreCase("Completed")){
+                task.setCompletedDate(LocalDate.now());
+            }
             taskRepository.save(task);
             User assignee = authService.getCurrentAuthenticatedUser();
             notificationService.sendGroup(task, assignee, taskInterestService.getByTaskAndExcludeUser(TaskInterest.builder().task(task).user(assignee).build()), content_update);
         }
 
         return true;
+    }
+
+    @Override
+    public List<Task> getByAssignee(Long assigneeId) {
+        return taskRepository.findByIsDeletedFalseAndAssigneeId(assigneeId);
     }
 
 

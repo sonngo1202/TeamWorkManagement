@@ -2,12 +2,14 @@ package com.example.team_work_management.controller;
 
 import com.example.team_work_management.config.Views;
 import com.example.team_work_management.entity.Task;
+import com.example.team_work_management.entity.User;
 import com.example.team_work_management.entity.WorkGroup;
 import com.example.team_work_management.service.TaskService;
 import com.fasterxml.jackson.annotation.JsonView;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController

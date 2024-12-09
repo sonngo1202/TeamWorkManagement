@@ -42,9 +42,9 @@ public class DocumentController {
     }
 
     @PreAuthorize("@groupSecurityService.hasInGroup(#idGroup, authentication.principal.id)")
-    @GetMapping("/{idGroup}/work-group/{idWG}/tasks/{idTask}/documents")
+    @GetMapping("/{idGroup}/documents")
     public ResponseEntity<?> getAll(@PathVariable Long idGroup){
-        return ResponseEntity.ok(documentService.getALl());
+        return ResponseEntity.ok(documentService.getALlByGroup(idGroup));
     }
 
 }

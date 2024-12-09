@@ -76,7 +76,7 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     @Override
-    public List<Document> getALl() {
-        return documentRepository.findAll();
+    public List<Document> getALlByGroup(Long idG) {
+        return documentRepository.findAllByGroupId(idG);
     }
 }
