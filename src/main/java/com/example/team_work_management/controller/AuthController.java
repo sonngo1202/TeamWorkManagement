@@ -88,7 +88,7 @@ public class AuthController {
     }
 
     @GetMapping("/tasks")
-    @JsonView(Views.Detailed.class)
+    @JsonView(Views.NotificationDetail.class)
     public ResponseEntity<?> getAllTask(@AuthenticationPrincipal CustomUserDetails user){
         return ResponseEntity.ok(taskService.getByAssignee(user.getId()));
     }

@@ -30,19 +30,19 @@ public class Task {
     private String name;
 
     @Column(name = "start_date", nullable = false)
-    @JsonView(Views.Detailed.class)
+    @JsonView({Views.Detailed.class, Views.NotificationDetail.class})
     private LocalDate startDate;
 
     @Column(name = "end_date", nullable = false)
-    @JsonView(Views.Detailed.class)
+    @JsonView({Views.Detailed.class, Views.NotificationDetail.class})
     private LocalDate endDate;
 
     @Column(name = "completed_date")
-    @JsonView(Views.Detailed.class)
+    @JsonView({Views.Detailed.class, Views.NotificationDetail.class})
     private LocalDate completedDate;
 
     @Column(name = "des")
-    @JsonView(Views.Detailed.class)
+    @JsonView({Views.Detailed.class, Views.NotificationDetail.class})
     private String des;
 
     @Column(name = "is_deleted", nullable = false)
@@ -51,17 +51,17 @@ public class Task {
 
     @ManyToOne
     @JoinColumn(name = "priority_level_id", nullable = false)
-    @JsonView(Views.Detailed.class)
+    @JsonView({Views.Detailed.class, Views.NotificationDetail.class})
     private PriorityLevel priorityLevel;
 
     @ManyToOne
     @JoinColumn(name = "status_id", nullable = false)
-    @JsonView(Views.Detailed.class)
+    @JsonView({Views.Detailed.class, Views.NotificationDetail.class})
     private Status status;
 
     @ManyToOne
     @JoinColumn(name = "assignee_id", nullable = false)
-    @JsonView(Views.Detailed.class)
+    @JsonView({Views.Detailed.class, Views.NotificationDetail.class})
     private User assignee;
 
     @ManyToOne
@@ -70,7 +70,7 @@ public class Task {
     private Task parentTask;
 
     @OneToMany(mappedBy = "parentTask")
-    @JsonView(Views.Detailed.class)
+    @JsonView({Views.Detailed.class, Views.NotificationDetail.class})
     private List<Task> listSubTask;
 
     @OneToMany(mappedBy = "task", fetch = FetchType.LAZY)
@@ -88,7 +88,7 @@ public class Task {
 
     @Column(name = "is_delay", nullable = false)
     @JsonProperty("isDelay")
-    @JsonView(Views.Detailed.class)
+    @JsonView({Views.Detailed.class, Views.NotificationDetail.class})
     private boolean isDelay;
 
     @PostLoad
