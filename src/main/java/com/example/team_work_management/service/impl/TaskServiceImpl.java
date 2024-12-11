@@ -141,6 +141,11 @@ public class TaskServiceImpl implements TaskService {
         return taskRepository.findByIsDeletedFalseAndAssigneeId(assigneeId);
     }
 
+    @Override
+    public List<Task> getAllByUserId(Long userId) {
+        return taskRepository.findAllTasksByUserId(userId);
+    }
+
 
     private void processEdit(Task task){
         Task saveTask = taskRepository.save(task);
