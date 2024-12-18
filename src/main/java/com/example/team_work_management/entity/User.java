@@ -76,5 +76,6 @@ public class User implements Serializable {
     private List<UserGroup> roles;
 
     @Transient
+    @JsonView(Views.Summary.class)
     private boolean isInGroup;
 }

@@ -13,7 +13,12 @@ import java.util.Optional;
 public interface ITaskRepository extends JpaRepository<Task, Long> {
     Optional<Task> findByIdAndIsDeletedFalse(Long id);
     boolean existsByIdAndAssigneeId(Long id, Long assignee);
-    List<Task> findByIsDeletedFalseAndAssigneeId(Long assigneeId);
+    @Query("SELECT t FROM Task t " +
+            "JOIN t.workGroup wg " +
+            "JOIN wg.group g " +
+            "WHERE t.isDeleted = false AND t.assignee.id = :assigneeId AND g.isClosed = false")
+    List<Task> findByIsDeletedFalseAndAssigneeIdAndGroupNotClosed(@Param("assigneeId") Long assigneeId);
+
 
     @Query("SELECT t FROM Task t " +
             "JOIN t.workGroup wg " +
@@ -22,5 +27,15 @@ public interface ITaskRepository extends JpaRepository<Task, Long> {
             "WHERE ug.user.id = :userId AND ug.isActive = true")
     List<Task> findAllTasksByUserId(@Param("userId") Long userId);
 
+    @Query("SELECT t FROM Task t " +
+            "JOIN t.workGroup wg " +
+            "JOIN wg.group g " +
+            "WHERE g.id = :groupId AND t.parentTask IS NULL")
+    List<Task> findAllTasksByGroupId(@Param("groupId") Long groupId);
 
+    @Query("SELECT COUNT(t) FROM Task t " +
+            "JOIN t.workGroup wg " +
+            "JOIN wg.group g " +
+            "WHERE t.isDeleted = false AND t.assignee.id = :userId AND g.id = :groupId AND g.isClosed = false")
+    Long countTasksByUserInGroup(@Param("userId") Long userId, @Param("groupId") Long groupId);
 }

@@ -13,4 +13,6 @@ public interface TaskService {
     boolean updateStatus(Long id, Long statusId);
     List<Task> getByAssignee(Long assigneeId);
     List<Task> getAllByUserId(Long userId);
+    List<Task> getAllByGroupId(Long groupId);
+    boolean hasUserTasksInGroup(Long userId, Long groupId);
 }

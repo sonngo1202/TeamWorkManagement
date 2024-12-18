@@ -59,6 +59,7 @@ public class GroupServiceImpl implements GroupService {
                 .role(role_Manager)
                 .joinedAt(LocalDateTime.now())
                 .isActive(true)
+                .position("Manager")
                 .build();
 
         userGroupService.save(userGroup);

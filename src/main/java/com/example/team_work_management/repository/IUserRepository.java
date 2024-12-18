@@ -15,7 +15,7 @@ public interface IUserRepository extends JpaRepository<User, Long> {
     Optional<User> findByEmailAndIsActiveTrue(String email);
 
     @Query("SELECT u, CASE WHEN COUNT(ug) > 0 THEN true ELSE false END AS isInGroup " +
-            "FROM User u LEFT JOIN UserGroup ug ON u.id = ug.user.id AND ug.group.id = :groupId " +
-            "WHERE u.email LIKE %:key% GROUP BY u.id")
+            "FROM User u LEFT JOIN UserGroup ug ON u.id = ug.user.id AND ug.group.id = :groupId AND ug.isActive = true " +
+            "WHERE u.email LIKE CONCAT(:key, '%') AND u.isActive = true GROUP BY u.id")
     List<Object[]> findWithGroupStatus(@Param("key") String key, @Param("groupId") Long groupId);
 }

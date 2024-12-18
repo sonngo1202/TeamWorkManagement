@@ -28,10 +28,8 @@ public class GroupMemberController {
     @PreAuthorize("@groupSecurityService.hasRoleInGroup(#id, 'MANAGER', authentication.principal.id)")
     @DeleteMapping("/{id}/member/{idUser}")
     public ResponseEntity<?> removeMember(@PathVariable Long id, @PathVariable Long idUser){
-        if(groupMemberService.removeMemberFromGroup(id, idUser)){
-            return ResponseEntity.ok("Member removed successfully");
-        }
-        return ResponseEntity.status(409).body("User is not already in the group or No permission to delete user");
+        groupMemberService.removeMemberFromGroup(id, idUser);
+        return ResponseEntity.ok("Member removed successfully");
 
     }
 

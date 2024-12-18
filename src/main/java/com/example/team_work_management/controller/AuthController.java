@@ -77,6 +77,7 @@ public class AuthController {
     }
 
     @GetMapping("/{key}/group/{groupId}")
+    @JsonView(Views.Summary.class)
     public ResponseEntity<?> searchByEmailAndGroup(@PathVariable Long groupId, @PathVariable String key){
         return ResponseEntity.ok(authService.searchByEmailAndGroup(key, groupId));
     }

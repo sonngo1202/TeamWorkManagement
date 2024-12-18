@@ -55,4 +55,11 @@ public class TaskController {
         taskService.updateStatus(id, idStatus);
         return ResponseEntity.ok("Task updated status successfully");
     }
+
+    @PreAuthorize("@groupSecurityService.hasInGroup(#idGroup, authentication.principal.id)")
+    @GetMapping("/{idGroup}/tasks")
+    @JsonView(Views.NotificationDetail.class)
+    public ResponseEntity<?> getAll(@PathVariable Long idGroup){
+        return ResponseEntity.ok(taskService.getAllByGroupId(idGroup));
+    }
 }

@@ -138,12 +138,23 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public List<Task> getByAssignee(Long assigneeId) {
-        return taskRepository.findByIsDeletedFalseAndAssigneeId(assigneeId);
+        return taskRepository.findByIsDeletedFalseAndAssigneeIdAndGroupNotClosed(assigneeId);
     }
 
     @Override
     public List<Task> getAllByUserId(Long userId) {
         return taskRepository.findAllTasksByUserId(userId);
+    }
+
+    @Override
+    public List<Task> getAllByGroupId(Long groupId) {
+        return taskRepository.findAllTasksByGroupId(groupId);
+    }
+
+    @Override
+    public boolean hasUserTasksInGroup(Long userId, Long groupId) {
+        Long taskCount = taskRepository.countTasksByUserInGroup(userId, groupId);
+        return taskCount > 0;
     }
 
 

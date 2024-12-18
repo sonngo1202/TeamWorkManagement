@@ -4,10 +4,10 @@ import com.example.team_work_management.entity.Group;
 import com.example.team_work_management.entity.User;
 import com.example.team_work_management.entity.UserGroup;
 import com.example.team_work_management.exception.error.AccessDeniedException;
-import com.example.team_work_management.service.AuthService;
-import com.example.team_work_management.service.GroupMemberService;
-import com.example.team_work_management.service.GroupService;
-import com.example.team_work_management.service.UserGroupService;
+import com.example.team_work_management.exception.error.GroupManagerCannotBeDeletedException;
+import com.example.team_work_management.exception.error.UserHasActiveTasksException;
+import com.example.team_work_management.exception.error.UserIsNotInGroupException;
+import com.example.team_work_management.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,6 +27,9 @@ public class GroupMemberServiceImpl implements GroupMemberService {
 
     @Autowired
     private GroupService groupService;
+
+    @Autowired
+    private TaskService taskService;
 
     @Override
     @Transactional
@@ -59,8 +62,16 @@ public class GroupMemberServiceImpl implements GroupMemberService {
         User member = authService.getDetail(idUser);
         UserGroup userGroup = userGroupService.get(member, group);
 
-        if(userGroup == null || userGroup.getRole().equalsIgnoreCase(role_Manager)){
-            return false;
+        if(userGroup == null){
+            throw new UserIsNotInGroupException("User is not in group");
+        }
+
+        if(userGroup.getRole().equalsIgnoreCase(role_Manager)){
+            throw new GroupManagerCannotBeDeletedException("Can't delete manager of group");
+        }
+
+        if(taskService.hasUserTasksInGroup(idUser, id)){
+            throw new UserHasActiveTasksException("User has active task");
         }
 
         userGroup.setActive(false);

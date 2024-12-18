@@ -20,7 +20,7 @@ public class WorkGroup {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @JsonView(Views.Detailed.class)
+    @JsonView({Views.Detailed.class, Views.NotificationDetail.class})
     private Long id;
 
     @Column(name = "name", nullable = false)

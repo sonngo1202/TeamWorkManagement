@@ -181,4 +181,37 @@ public class ControllerExceptionHandler {
                 ex.getMessage(),
                 request.getDescription(false));
     }
+
+    @ExceptionHandler(GroupManagerCannotBeDeletedException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ErrorMessage handleGroupManagerCannotBeDeletedException(GroupManagerCannotBeDeletedException ex, WebRequest request){
+        return new ErrorMessage(
+                HttpStatus.CONFLICT.value(),
+                new Date(),
+                ex.getMessage(),
+                request.getDescription(false)
+        );
+    }
+
+    @ExceptionHandler(UserHasActiveTasksException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ErrorMessage handleUserHasActiveTaskException(UserHasActiveTasksException ex, WebRequest request){
+        return new ErrorMessage(
+                HttpStatus.CONFLICT.value(),
+                new Date(),
+                ex.getMessage(),
+                request.getDescription(false)
+        );
+    }
+
+    @ExceptionHandler(UserIsNotInGroupException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ErrorMessage handleUserIsNotInGroupException(UserIsNotInGroupException ex, WebRequest request){
+        return new ErrorMessage(
+                HttpStatus.CONFLICT.value(),
+                new Date(),
+                ex.getMessage(),
+                request.getDescription(false)
+        );
+    }
 }
