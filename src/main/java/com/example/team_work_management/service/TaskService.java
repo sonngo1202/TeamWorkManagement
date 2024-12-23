@@ -15,4 +15,6 @@ public interface TaskService {
     List<Task> getAllByUserId(Long userId);
     List<Task> getAllByGroupId(Long groupId);
     boolean hasUserTasksInGroup(Long userId, Long groupId);
+    List<Task> getByStatusAndGroup(Long idGroup, Long idStatus);
+    List<Task> getByUserAndGroup(Long idUser, Long idGroup);
 }

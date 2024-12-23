@@ -157,6 +157,15 @@ public class TaskServiceImpl implements TaskService {
         return taskCount > 0;
     }
 
+    @Override
+    public List<Task> getByStatusAndGroup(Long idGroup, Long idStatus) {
+        return taskRepository.findByStatusAndGroup(idGroup, idStatus);
+    }
+
+    @Override
+    public List<Task> getByUserAndGroup(Long idUser, Long idGroup) {
+        return taskRepository.findByUserAndGroup(idUser, idGroup);
+    }
 
     private void processEdit(Task task){
         Task saveTask = taskRepository.save(task);

@@ -36,6 +36,19 @@ public interface ITaskRepository extends JpaRepository<Task, Long> {
     @Query("SELECT COUNT(t) FROM Task t " +
             "JOIN t.workGroup wg " +
             "JOIN wg.group g " +
-            "WHERE t.isDeleted = false AND t.assignee.id = :userId AND g.id = :groupId AND g.isClosed = false")
+            "WHERE t.isDeleted = false AND wg.isDeleted = false AND t.assignee.id = :userId AND g.id = :groupId AND g.isClosed = false")
     Long countTasksByUserInGroup(@Param("userId") Long userId, @Param("groupId") Long groupId);
+
+    @Query("SELECT t FROM Task t " +
+            "JOIN t.status s " +
+            "JOIN t.workGroup wg " +
+            "JOIN wg.group g " +
+            "WHERE g.id = :idGroup AND s.id = :idStatus AND t.isDeleted = false AND wg.isDeleted = false")
+    List<Task> findByStatusAndGroup(@Param("idGroup")Long idGroup, @Param("idStatus") Long idStatus);
+
+    @Query("SELECT t FROM Task t " +
+            "JOIN t.workGroup wg " +
+            "JOIN wg.group g " +
+            "WHERE t.isDeleted = false AND wg.isDeleted = false AND t.assignee.id = :userId AND g.id = :groupId AND g.isClosed = false")
+    List<Task> findByUserAndGroup(@Param("userId")Long userId, @Param("groupId")Long groupId);
 }
