@@ -9,6 +9,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class CommentServiceImpl implements CommentService {
@@ -41,9 +43,11 @@ public class CommentServiceImpl implements CommentService {
         comment.setTask(task);
         Comment saveComment = commentRepository.save(comment);
 
+        List<User> taggedUsers = new ArrayList<>();
         if(comment.getListTag() != null){
             for(Tag tag : comment.getListTag()){
                 User tagUser = authService.getDetail(tag.getUser().getId());
+                taggedUsers.add(tagUser);
                 tagService.save(Tag.builder()
                         .comment(saveComment)
                         .position(tag.getPosition())
@@ -60,7 +64,15 @@ public class CommentServiceImpl implements CommentService {
                             .user(creator)
                             .build());
         }
-        notificationService.sendGroup(task, creator, taskInterestService.getByTaskAndExcludeUser(TaskInterest.builder().task(task).user(creator).build()), "đã thêm bình luận mới");
+
+        List<TaskInterest> taskInterests = taskInterestService.getByTaskAndExcludeUser(TaskInterest.builder().task(task).user(creator).build());
+        List<TaskInterest> filteredTaskInterests = new ArrayList<>();
+        for (TaskInterest taskInterest : taskInterests) {
+            if (!taggedUsers.contains(taskInterest.getUser())) {
+                filteredTaskInterests.add(taskInterest);
+            }
+        }
+        notificationService.sendGroup(task, creator, filteredTaskInterests, "đã thêm bình luận mới");
 
         return true;
     }
@@ -74,9 +86,11 @@ public class CommentServiceImpl implements CommentService {
         editComment.setContent(comment.getContent());
         commentRepository.save(editComment);
 
+        List<User> taggedUsers = new ArrayList<>();
         if(comment.getListTag() != null){
             for(Tag tag : comment.getListTag()){
                 User tagUser = authService.getDetail(tag.getUser().getId());
+                taggedUsers.add(tagUser);
                 tagService.save(Tag.builder()
                         .comment(editComment)
                         .position(tag.getPosition())
@@ -87,7 +101,15 @@ public class CommentServiceImpl implements CommentService {
             }
         }
 
-        notificationService.sendGroup(editComment.getTask(), editComment.getCreator(), taskInterestService.getByTaskAndExcludeUser(TaskInterest.builder().task(editComment.getTask()).user(editComment.getCreator()).build()), "đã thêm bình luận mới");
+        List<TaskInterest> taskInterests = taskInterestService.getByTaskAndExcludeUser(TaskInterest.builder().task(editComment.getTask()).user(editComment.getCreator()).build());
+        List<TaskInterest> filteredTaskInterests = new ArrayList<>();
+        for (TaskInterest taskInterest : taskInterests) {
+            if (!taggedUsers.contains(taskInterest.getUser())) {
+                filteredTaskInterests.add(taskInterest);
+            }
+        }
+
+        notificationService.sendGroup(editComment.getTask(), editComment.getCreator(), filteredTaskInterests, "đã thêm bình luận mới");
         return true;
     }
 

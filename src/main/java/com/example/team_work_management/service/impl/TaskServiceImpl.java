@@ -55,9 +55,9 @@ public class TaskServiceImpl implements TaskService {
     @Transactional
     public boolean add(Task task) {
         task.setDeleted(false);
-        task.setDelay(false);
+        task.setDelay(task.getEndDate().isBefore(LocalDate.now()));
         task.setPriorityLevel(priorityLevelService.getById(task.getPriorityLevel().getId()));
-        task.setStatus(statusService.getById(task.getStatus().getId()));
+        task.setStatus(statusService.getById(2L));
         task.setWorkGroup(workGroupService.getById(task.getWorkGroup().getId()));
 
         if(task.getParentTask() != null){
@@ -91,9 +91,15 @@ public class TaskServiceImpl implements TaskService {
         taskEdit.setPriorityLevel(priorityLevelService.getById(task.getPriorityLevel().getId()));
         taskEdit.setStartDate(task.getStartDate());
         taskEdit.setEndDate(task.getEndDate());
-        if(task.getEndDate().isAfter(LocalDate.now())){
+
+        if(!task.getEndDate().isBefore(LocalDate.now())){
+            taskEdit.setDelay(false);
+        }else if(!taskEdit.getStatus().getName().equalsIgnoreCase("Completed")){
+            taskEdit.setDelay(true);
+        }else if(!task.getEndDate().isBefore(taskEdit.getCompletedDate())){
             taskEdit.setDelay(false);
         }
+
         if(!task.getAssignee().getId().equals(taskEdit.getAssignee().getId())){
             processEdit(taskEdit, authService.getDetail(task.getAssignee().getId()));
         }else{

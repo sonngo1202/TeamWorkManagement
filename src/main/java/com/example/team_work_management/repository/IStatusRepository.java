@@ -12,12 +12,12 @@ import java.util.List;
 @Repository
 public interface IStatusRepository extends JpaRepository<Status, Long> {
 
-    @Query("SELECT new com.example.team_work_management.dto.StatusStat(s.id, s.name, COUNT(t), SUM(CASE WHEN t.isDelay = true THEN 1 ELSE 0 END)) " +
-            "FROM Task t " +
-            "JOIN t.status s " +
-            "JOIN t.workGroup wg " +
-            "JOIN wg.group g " +
-            "WHERE g.id = :idGroup AND t.isDeleted = false AND wg.isDeleted = false " +
+    @Query("SELECT new com.example.team_work_management.dto.StatusStat(s.id, s.name, COUNT(CASE WHEN g.id IS NOT NULL THEN t.id ELSE NULL END), " +
+            "SUM(CASE WHEN g.id IS NOT NULL AND t.isDelay = true THEN 1 ELSE 0 END)) " +
+            "FROM Status s " +
+            "LEFT JOIN Task t ON t.status.id = s.id " +
+            "LEFT JOIN WorkGroup wg ON wg.id = t.workGroup.id " +
+            "LEFT JOIN Group g ON g.id = wg.group.id AND g.id = :idGroup AND t.isDeleted = false AND wg.isDeleted = false " +
             "GROUP BY s.id")
     List<StatusStat> countTask(@Param("idGroup") Long idGroup);
 }

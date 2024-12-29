@@ -15,4 +15,5 @@ public class GroupMemberStat {
     private long countNS;
     private long countIG;
     private long countCl;
+    private long countDelay;
 }

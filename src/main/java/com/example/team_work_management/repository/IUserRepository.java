@@ -25,9 +25,10 @@ public interface IUserRepository extends JpaRepository<User, Long> {
             "u.fullName, " +
             "u.email, " +
             "u.picture, " +
-            "SUM(CASE WHEN t.status.id = 1 THEN 1 ELSE 0 END), " +
-            "SUM(CASE WHEN t.status.id = 2 THEN 1 ELSE 0 END), " +
-            "SUM(CASE WHEN t.status.id = 3 THEN 1 ELSE 0 END)) " +
+            "SUM(CASE WHEN t.status.id = 1 AND g.id = :groupId THEN 1 ELSE 0 END), " +
+            "SUM(CASE WHEN t.status.id = 2 AND g.id = :groupId THEN 1 ELSE 0 END), " +
+            "SUM(CASE WHEN t.status.id = 3 AND g.id = :groupId THEN 1 ELSE 0 END), " +
+            "SUM(CASE WHEN g.id = :groupId AND t.isDelay = true THEN 1 ELSE 0 END)) " +
             "FROM User u " +
             "LEFT JOIN Task t ON u.id = t.assignee.id " +
             "LEFT JOIN WorkGroup wg ON wg.id = t.workGroup.id " +

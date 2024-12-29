@@ -44,7 +44,7 @@ public class TaskController {
 
     @PreAuthorize("@groupSecurityService.hasRoleInGroup(#idGroup, 'MANAGER', authentication.principal.id)")
     @DeleteMapping("/{idGroup}/work-group/{idWG}/tasks/{id}")
-    public ResponseEntity<?> delete(@RequestBody Task task, @PathVariable Long idGroup, @PathVariable Long id){
+    public ResponseEntity<?> delete(@PathVariable Long idGroup, @PathVariable Long id){
         taskService.delete(id);
         return ResponseEntity.ok("Task deleted successfully");
     }
