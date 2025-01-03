@@ -50,7 +50,8 @@ public class CommentServiceImpl implements CommentService {
                 taggedUsers.add(tagUser);
                 tagService.save(Tag.builder()
                         .comment(saveComment)
-                        .position(tag.getPosition())
+                        .start(tag.getStart())
+                        .end(tag.getEnd())
                         .user(tagUser)
                         .build());
 
@@ -93,7 +94,8 @@ public class CommentServiceImpl implements CommentService {
                 taggedUsers.add(tagUser);
                 tagService.save(Tag.builder()
                         .comment(editComment)
-                        .position(tag.getPosition())
+                        .start(tag.getStart())
+                        .end(tag.getEnd())
                         .user(tagUser)
                         .build());
 

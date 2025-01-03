@@ -19,9 +19,13 @@ public class Tag {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "position", nullable = false)
+    @Column(name = "start", nullable = false)
     @JsonView(Views.Summary.class)
-    private int position;
+    private int start;
+
+    @Column(name = "end", nullable = false)
+    @JsonView(Views.Summary.class)
+    private int end;
 
     @ManyToOne
     @JoinColumn(name = "comment_id", nullable = false)

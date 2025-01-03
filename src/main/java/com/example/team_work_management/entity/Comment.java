@@ -19,6 +19,7 @@ import java.util.List;
 public class Comment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @JsonView(Views.Summary.class)
     private Long id;
 
     @Column(name = "content", nullable = false)
