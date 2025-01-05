@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 
@@ -45,6 +46,9 @@ public class TaskServiceImpl implements TaskService {
     @Autowired
     private NotificationService notificationService;
 
+    @Autowired
+    private EmailService emailService;
+
     @Override
     public Task getById(Long id) {
         return taskRepository.findByIdAndIsDeletedFalse(id)
@@ -77,6 +81,7 @@ public class TaskServiceImpl implements TaskService {
         if(!manager.getId().equals(assignee.getId())){
             taskInterestService.save(TaskInterest.builder().task(saveTask).user(assignee).build());
             notificationService.send(saveTask, manager, assignee, content_assignment);
+            sendTaskNotification(saveTask, saveTask.getAssignee().getEmail(),"The task has been assigned to you.");
         }
 
         return true;
@@ -116,6 +121,7 @@ public class TaskServiceImpl implements TaskService {
 
         User manager = authService.getCurrentAuthenticatedUser();
         notificationService.sendGroup(deleteTask, manager, taskInterestService.getByTaskAndExcludeUser(TaskInterest.builder().task(deleteTask).user(manager).build()), content_delete);
+        sendTaskNotification(deleteTask, deleteTask.getAssignee().getEmail(),"The task has been revoked.");
         return true;
     }
 
@@ -173,6 +179,21 @@ public class TaskServiceImpl implements TaskService {
         return taskRepository.findByUserAndGroup(idUser, idGroup);
     }
 
+    @Override
+    public List<Task> getByEndDate(LocalDate endDate) {
+        return taskRepository.findTasksByEndDate(endDate);
+    }
+
+    @Override
+    public void updateTasksAsDelayed(LocalDate yesterday) {
+        taskRepository.updateIsDelayForTasks(yesterday);
+    }
+
+    @Override
+    public List<Task> getByDelayed(LocalDate yesterday) {
+        return taskRepository.findTaskDelayed(yesterday);
+    }
+
     private void processEdit(Task task){
         Task saveTask = taskRepository.save(task);
         User manager = authService.getCurrentAuthenticatedUser();
@@ -188,12 +209,73 @@ public class TaskServiceImpl implements TaskService {
         if(!assignee_currently.getId().equals(manager.getId())){
             taskInterestService.delete(TaskInterest.builder().task(saveTask).user(assignee_currently).build());
             notificationService.send(task, manager, assignee_currently, content_change_person);
+            sendTaskNotification(saveTask, assignee_currently.getEmail(),"The task has been assigned to another member.");
         }
         notificationService.sendGroup(saveTask, manager, taskInterestService.getByTaskAndExcludeUser(TaskInterest.builder().task(saveTask).user(manager).build()), content_edit);
         if(!substitute.getId().equals(manager.getId())){
             notificationService.send(task, manager, substitute, content_assignment);
             taskInterestService.save(TaskInterest.builder().task(saveTask).user(substitute).build());
+            sendTaskNotification(saveTask, substitute.getEmail(),"The task has been assigned to you.");
         }
 
     }
+
+    private String formatDateToString(LocalDate date) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d MMMM, yyyy");
+        return date.format(formatter);
+    }
+
+    private String getPriorityColor(Long priorityLevel) {
+        return switch (priorityLevel.intValue()) {
+            case 1 -> "#FF5722";
+            case 2 -> "#F0A500";
+            case 3 -> "#008000";
+            default -> "black";
+        };
+    }
+
+    private String createHtmlToEmail(Task task, String message) {
+        String priorityColor = getPriorityColor(task.getPriorityLevel().getId());
+        String taskUrl = "http://localhost:3000/group/" + task.getWorkGroup().getGroup().getId() + "/board/" +
+                task.getWorkGroup().getId() + "/tasks/" + task.getId();
+
+        String htmlUrl = "";
+        if (!message.equalsIgnoreCase("The task has been revoked.")) {
+            htmlUrl = "    <p>You can view and manage the task by clicking the link below:</p>\n" +
+                    "    <a href=\"" + taskUrl + "\" style=\"color: #007bff;\">Go to Task</a>\n" +
+                    "\n";
+        }
+
+        // Xây dựng nội dung email
+        return "<html>\n" +
+                "  <body>\n" +
+                "    <h2 style=\"color: #4CAF50;\">Task Notification</h2>\n" +
+                "    <p>Dear User,</p>\n" +
+                "    <p>" + message + "</p>\n" +
+                "\n" +
+                "    <h3 style=\"color: #007bff;\">Task Details:</h3>\n" +
+                "    <ul>\n" +
+                "      <li><strong>Task Name:</strong> " + task.getName() + "</li>\n" +
+                "      <li><strong>Priority:</strong> <span style=\"color: " + priorityColor + ";\">" + task.getPriorityLevel().getName() + "</span></li>\n" +
+                "      <li><strong>Start Date:</strong> " + formatDateToString(task.getStartDate()) + "</li>\n" +
+                "      <li><strong>Due Date:</strong> " + formatDateToString(task.getEndDate()) + "</li>\n" +
+                "    </ul>\n" +
+                "\n" +
+                htmlUrl +
+                "    <br><br>\n" +
+                "    <p>Thank you for using Pandoras.</p>\n" +
+                "    <footer>\n" +
+                "      <p style=\"font-size: 0.8em; color: #777;\">Pandoras - All rights reserved.</p>\n" +
+                "    </footer>\n" +
+                "  </body>\n" +
+                "</html>\n";
+    }
+
+
+    private void sendTaskNotification(Task task, String email,String message){
+        String title = "[Pandoras] Notification: Task - " + task.getName();
+        String emailContent = createHtmlToEmail(task, message);
+        emailService.sendSimpleMessageHtml(email, title, emailContent);
+    }
+
 }

@@ -2,10 +2,13 @@ package com.example.team_work_management.repository;
 
 import com.example.team_work_management.entity.Task;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -51,4 +54,15 @@ public interface ITaskRepository extends JpaRepository<Task, Long> {
             "JOIN wg.group g " +
             "WHERE t.isDeleted = false AND wg.isDeleted = false AND t.assignee.id = :userId AND g.id = :groupId AND g.isClosed = false")
     List<Task> findByUserAndGroup(@Param("userId")Long userId, @Param("groupId")Long groupId);
+
+    @Modifying
+    @Transactional
+    @Query("UPDATE Task t SET t.isDelay = true WHERE t.endDate <= :yesterday AND t.status.id != 3 AND t.isDelay = false")
+    int updateIsDelayForTasks(@Param("yesterday") LocalDate yesterday);
+
+    @Query("SELECT t FROM Task t WHERE t.endDate = :endDate")
+    List<Task> findTasksByEndDate(LocalDate endDate);
+
+    @Query("SELECT t FROM Task t WHERE t.endDate <= :yesterday AND t.status.id != 3 AND t.isDelay = false")
+    List<Task> findTaskDelayed(LocalDate yesterday);
 }
