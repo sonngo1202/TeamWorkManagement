@@ -12,8 +12,8 @@ public class GroupMemberStat {
     private String fullName;
     private String email;
     private String picture;
-    private long countNS;
     private long countIG;
+    private long countNS;
     private long countCl;
     private long countDelay;
 }
